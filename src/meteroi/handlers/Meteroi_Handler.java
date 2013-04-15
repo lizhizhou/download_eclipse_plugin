@@ -48,7 +48,7 @@ public class Meteroi_Handler extends AbstractHandler {
 					System.out.println(filename);
 					try 
 					{ 
-						String command = "./download";
+						String command = "./download.sh";
 						File path =  new File(file.getParent().getLocation().toString());
 						System.out.println(path.toString());
 						Process pro = Runtime.getRuntime().exec(command, null, path);          
@@ -89,11 +89,6 @@ public class Meteroi_Handler extends AbstractHandler {
 			}
 		};
 		download.schedule(); 		
-		
-		MessageDialog.openInformation(
-				window.getShell(),
-				"Meteroi",
-				"Meteroi_download");
 		return null;
 	}
 }
