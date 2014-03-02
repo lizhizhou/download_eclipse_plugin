@@ -37,8 +37,15 @@ public class Meteroi_Handler extends AbstractHandler {
 	 * from the application context.
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		IEditorInput editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+		IEditorInput editor;
+		try {
+			editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
+		} catch(NullPointerException exception1) 
+		{
+			System.out.println("No file select"); 
+			return Status.OK_STATUS;
+		}
 		final IFile file = (IFile)editor.getAdapter(IFile.class);
 		Job download = new Job("Meteroi downloading"){
 			public IStatus run(IProgressMonitor monitor) {
@@ -48,7 +55,7 @@ public class Meteroi_Handler extends AbstractHandler {
 					System.out.println(filename);
 					try 
 					{ 
-						String command = "./download";
+						String command = "./download.sh";
 						File path =  new File(file.getParent().getLocation().toString());
 						System.out.println(path.toString());
 						Process pro = Runtime.getRuntime().exec(command, null, path);          
@@ -74,7 +81,7 @@ public class Meteroi_Handler extends AbstractHandler {
 				        Display.getDefault().asyncExec(new Runnable() {                        
 				            public void run() {                                                                                   
 								MessageDialog.openInformation(
-										null,
+										window.getShell(),
 										"Meteroi",
 										"Download OK");
 				            }
@@ -82,18 +89,14 @@ public class Meteroi_Handler extends AbstractHandler {
 					} 
 					catch(IOException exception1) 
 					{ 
-						System.out.println("error"); 
+						exception1.printStackTrace();
+						System.out.println("IO error"); 
 					} 
 				}    		
 				return  Status.OK_STATUS;
 			}
 		};
 		download.schedule(); 		
-		
-		MessageDialog.openInformation(
-				window.getShell(),
-				"Meteroi",
-				"Meteroi_download");
 		return null;
 	}
 }
